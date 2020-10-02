@@ -54,10 +54,11 @@ class Player:
 class Enemy:
     surface = pygame.image.load('assets/enemy.png').convert_alpha()
     y = Base.y
-    vel = 3
+    vel = 5
     
     def __init__(self, x):
         self.x = x
+        self.passed = False
         self.rect = Enemy.surface.get_rect(bottomleft=(self.x, Enemy.y))
     
     def move(self):
@@ -68,9 +69,10 @@ class Enemy:
 
 
 def main():
-    b = Base()
-    p = Player(Base.y)
-    e = Enemy(200)
+    base = Base()
+    player = Player(Base.y)
+    enemies = [Enemy(1000)]
+    score = 0
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -79,16 +81,31 @@ def main():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    p.jump()
+                    player.jump()
                 
-        if p.collide(e):
-            print('yo watch out')
+        
+        player.move()
+        for enemy in enemies[:]:
+            enemy.move()
+            if player.collide(enemy):
+                pygame.quit()
+                sys.exit()
+            if enemy.passed == False and enemy.x < 0:
+                enemy.passed = True
+                enemies.append(Enemy(1000))
+                score += 1
+                enemies.pop(0)
+        
+        
         screen.fill((255,255,255))
-        p.move()
-        e.move()
-        e.draw(screen)
-        b.draw(screen)
-        p.draw(screen)
+        base.draw(screen)
+        player.draw(screen)
+        for enemy in enemies:
+            enemy.draw(screen)
+        
+        scoreText = FONT.render(f'Score: {score}', 1, (0,0,0))
+        screen.blit(scoreText, (0,0))   
+        
         pygame.display.flip()
         clock.tick(100)
 
