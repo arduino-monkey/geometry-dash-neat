@@ -10,25 +10,26 @@ clock = pygame.time.Clock()
 
 FONT = pygame.font.SysFont('comicsans', 40)
 
-groundSurface = pygame.image.load('assets/ground.png')
 
-class PLayer:
-    def __init__(self):
-        pass
-
-x = 0
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-
-    if x <= -WIDTH:
-        x = 0
-    else:
-        x -= 3
+class Base:
+    width = 1000
+    height = 200
+    rect = pygame.Rect(0,HEIGHT-height,width,height)
+    def draw(self, screen):
+        pygame.draw.rect(screen,(249, 1, 63),Base.rect)
     
-    screen.blit(groundSurface, (x, 50))
-    screen.blit(groundSurface,(x + WIDTH, 50))
-    pygame.display.update()
-    clock.tick(60)
+
+def main():
+    b = Base()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        b.draw(screen)
+        pygame.display.update()
+        clock.tick(60)
+
+if __name__ == '__main__':
+    main()
