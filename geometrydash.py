@@ -22,7 +22,7 @@ class Base:
     
 
 class Player:
-    surface = pygame.image.load('assets/player.png')
+    surface = pygame.image.load('assets/player.png').convert_alpha()
     x = 50
     gravity = 0.5
     def __init__(self, y):
@@ -41,27 +41,36 @@ class Player:
     def jump(self):
         if self.rect.bottomleft[1] >= Base.y:
             self.movement = 0
-            self.movement -= 10
+            self.movement -= 12
             self.rect.centery += self.movement
+
+    def collide(self, enemy):
+        collision = self.rect.colliderect(enemy.rect)
+        if collision:
+            return True
+        else:
+            return False
         
 class Enemy:
-    surface = pygame.image.load('assets/enemy.png')
+    surface = pygame.image.load('assets/enemy.png').convert_alpha()
     y = Base.y
     vel = 3
     
     def __init__(self, x):
         self.x = x
-        self.rect = Enemy.surface.get_rect(bottomleft=(self.y, Enemy.x))
+        self.rect = Enemy.surface.get_rect(bottomleft=(self.x, Enemy.y))
     
     def move(self):
         self.x -= Enemy.vel
-    
-    def draw(self):
+        self.rect.centerx -= Enemy.vel
+    def draw(self, screen):
         screen.blit(Enemy.surface, self.rect)
+
 
 def main():
     b = Base()
     p = Player(Base.y)
+    e = Enemy(200)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -72,8 +81,12 @@ def main():
                 if event.key == pygame.K_SPACE:
                     p.jump()
                 
-        screen.fill((0,0,0))
+        if p.collide(e):
+            print('yo watch out')
+        screen.fill((255,255,255))
         p.move()
+        e.move()
+        e.draw(screen)
         b.draw(screen)
         p.draw(screen)
         pygame.display.flip()
