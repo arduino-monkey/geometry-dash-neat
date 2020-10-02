@@ -106,8 +106,10 @@ def main():
         scoreText = FONT.render(f'Score: {score}', 1, (0,0,0))
         screen.blit(scoreText, (0,0))   
         
+        print(enemies)
         pygame.display.flip()
         clock.tick(100)
+
 
 if __name__ == '__main__':
     main()
