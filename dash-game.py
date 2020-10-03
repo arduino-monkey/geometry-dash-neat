@@ -57,6 +57,7 @@ class Enemy:
     vel = 5
     
     def __init__(self, x):
+        two = bool(random.getrandbits(1))
         self.x = x
         self.passed = False
         self.rect = Enemy.surface.get_rect(bottomleft=(self.x, Enemy.y))
@@ -106,7 +107,6 @@ def main():
         scoreText = FONT.render(f'Score: {score}', 1, (0,0,0))
         screen.blit(scoreText, (0,0))   
         
-        print(enemies)
         pygame.display.flip()
         clock.tick(100)
 

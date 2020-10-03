@@ -96,9 +96,9 @@ def main(genomes, config):
                 
         
         for i, player in enumerate(players):
-            ge[i].fitness += 0.1
+            ge[i].fitness += 0.001
             player.move()
-            output = nets[i].activate((abs(player.x-enemies[-1].x),))
+            output = nets[i].activate((abs((player.x-enemies[-1].x**2)-(player.y-enemies[-1].y)**2),))
             if output[0] >0.5:
                 player.jump()
             
@@ -107,7 +107,7 @@ def main(genomes, config):
             for player in players[:]:
                 if player.collide(enemy):
                     playerIndex = players.index(player)
-                    ge[playerIndex].fitness -= 1
+                    ge[playerIndex].fitness -= 2
                     nets.pop(playerIndex)
                     ge.pop(playerIndex)
                     players.pop(playerIndex)
@@ -118,13 +118,15 @@ def main(genomes, config):
                 enemies.append(Enemy(1000))
                 score += 1
                 for genome in ge:
-                    genome.fitness += 5
+                    genome.fitness += 6
                 enemies.pop(0)
         
         
         screen.fill((255,255,255))
         base.draw(screen)
-        player.draw(screen)
+
+        for player in players:
+            player.draw(screen)
         for enemy in enemies:
             enemy.draw(screen)
         
