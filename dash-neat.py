@@ -21,26 +21,28 @@ class Base:
     
 
 class Player:
-    surface = pygame.image.load('assets/player.png').convert_alpha()
-    x = 50
+    #surface = pygame.image.load('assets/player.png').convert_alpha()
     gravity = 0.5
     def __init__(self, y):
-        self.y = y
-        self.rect = Player.surface.get_rect(bottomleft = (Player.x, self.y))
+        self.y = y-50
+        self.x = random.randint(30,500)
+        self.rect = pygame.Rect(self.x, self.y, 50, 50)
         self.movement = 0
     def move(self):
         if self.rect.bottomleft[1] <= Base.y:
             self.movement += Player.gravity
-            self.rect.centery += self.movement
+            self.y += self.movement
+            self.rect.centery = self.y
 
     def draw(self, screen):
-        screen.blit(Player.surface, self.rect)
+        pygame.draw.rect(screen, (0,0,0), self.rect)
 
     def jump(self):
         if self.rect.bottomleft[1] >= Base.y:
             self.movement = 0
             self.movement -= 12
-            self.rect.centery += self.movement
+            self.y += self.movement
+            self.rect.centery = self.y
 
     def collide(self, enemy):
         collision = self.rect.colliderect(enemy.rect)
@@ -93,35 +95,49 @@ def main(genomes, config):
                 pygame.quit()
                 sys.exit()
                 break
-                
-        
+
+        enemyIndex = 0
+        if len(players):
+            if len(enemies) > 1 and 30 > enemies[0].x + 50:
+                enemyIndex = 1 
+
         for i, player in enumerate(players):
-            ge[i].fitness += 0.001
+            ge[i].fitness += 0.03
             player.move()
-            output = nets[i].activate((abs((player.x-enemies[-1].x**2)-(player.y-enemies[-1].y)**2),))
+            dist = abs(player.x-enemies[-1].x)
+            output = nets[i].activate((dist,))
             if output[0] >0.5:
                 player.jump()
-            
-        for enemy in enemies[:]:
+        
+        rem = []
+        addEnemy = False
+        for enemy in enemies:
             enemy.move()
-            for player in players[:]:
+            for player in players:
                 if player.collide(enemy):
                     playerIndex = players.index(player)
-                    ge[playerIndex].fitness -= 2
+                    ge[playerIndex].fitness -= 1
                     nets.pop(playerIndex)
                     ge.pop(playerIndex)
                     players.pop(playerIndex)
 
+            if enemy.x + 50 < 0:
+                rem.append(enemy)
                 
-            if enemy.passed == False and enemy.x < 0:
+            if not enemy.passed and enemy.x < 30:
                 enemy.passed = True
-                enemies.append(Enemy(1000))
-                score += 1
-                for genome in ge:
-                    genome.fitness += 6
-                enemies.pop(0)
+                addEnemy = True
         
+        if addEnemy:
+            score += 1
+            for genome in ge:
+                genome.fitness += 5
+            enemies.append(Enemy(WIDTH))
         
+        for r in rem:
+            enemies.remove(r)
+
+
         screen.fill((255,255,255))
         base.draw(screen)
 
